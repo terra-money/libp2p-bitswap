@@ -1090,28 +1090,30 @@ mod tests {
     assert!(res.is_none());
   }
 
-  #[cfg(feature = "compat")]
-  #[async_std::test]
-  async fn compat_test() {
-    tracing_try_init();
-    let cid: Cid = "QmP8njGuyiw9cjkhwHD9nZhyBTHufXFanAvZgcy9xYoWiB"
-      .parse()
-      .unwrap();
-    let peer_id: PeerId =
-      "12D3KooWC1EaEEpghwnPdd89LaPTKEweD1PRLz4aRBkJEA9UiUuS"
-        .parse()
-        .unwrap();
-    let multiaddr: Multiaddr = "/ip4/95.217.194.97/tcp/8008".parse().unwrap();
-
-    let mut peer = Peer::new();
-    peer
-      .swarm()
-      .behaviour_mut()
-      .add_address(&peer_id, multiaddr);
-    let id = peer
-      .swarm()
-      .behaviour_mut()
-      .get(cid, std::iter::once(peer_id));
-    assert_complete_ok(peer.next().await, id);
-  }
+  // NOTE(bmaas): This test depends on an external IPFS node running, disabled
+  // for now #[cfg(feature = "compat")]
+  // #[async_std::test]
+  // async fn compat_test() {
+  //   tracing_try_init();
+  //   let cid: Cid = "QmP8njGuyiw9cjkhwHD9nZhyBTHufXFanAvZgcy9xYoWiB"
+  //     .parse()
+  //     .unwrap();
+  //   let peer_id: PeerId =
+  //     "12D3KooWC1EaEEpghwnPdd89LaPTKEweD1PRLz4aRBkJEA9UiUuS"
+  //       .parse()
+  //       .unwrap();
+  //   let multiaddr: Multiaddr =
+  // "/ip4/95.217.194.97/tcp/8008".parse().unwrap();
+  //
+  //   let mut peer = Peer::new();
+  //   peer
+  //     .swarm()
+  //     .behaviour_mut()
+  //     .add_address(&peer_id, multiaddr);
+  //   let id = peer
+  //     .swarm()
+  //     .behaviour_mut()
+  //     .get(cid, std::iter::once(peer_id));
+  //   assert_complete_ok(peer.next().await, id);
+  // }
 }
