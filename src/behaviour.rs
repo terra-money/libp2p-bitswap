@@ -287,6 +287,7 @@ fn start_db_thread<S: BitswapStore>(
             .ok();
         }
         DbRequest::Insert(block) => {
+          tracing::trace!("inserting block {}", block.cid());
           if let Err(err) = store.insert(&block) {
             tracing::error!("error inserting blocks {}", err);
           }
