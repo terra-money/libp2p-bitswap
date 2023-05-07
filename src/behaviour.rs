@@ -87,13 +87,13 @@ pub trait BitswapStore: Send + Sync + 'static {
   /// The store params.
   type Params: StoreParams;
   /// A have query needs to know if the block store contains the block.
-  fn contains(&mut self, cid: &Cid) -> Result<bool>;
+  fn contains(&self, cid: &Cid) -> Result<bool>;
   /// A block query needs to retrieve the block from the store.
-  fn get(&mut self, cid: &Cid) -> Result<Option<Vec<u8>>>;
+  fn get(&self, cid: &Cid) -> Result<Option<Vec<u8>>>;
   /// A block response needs to insert the block into the store.
-  fn insert(&mut self, block: &Block<Self::Params>) -> Result<()>;
+  fn insert(&self, block: &Block<Self::Params>) -> Result<()>;
   /// A sync query needs a list of missing blocks to make progress.
-  fn missing_blocks(&mut self, cid: &Cid) -> Result<Vec<Cid>>;
+  fn missing_blocks(&self, cid: &Cid) -> Result<Vec<Cid>>;
 }
 
 /// Bitswap configuration.
@@ -245,7 +245,7 @@ enum DbResponse {
 }
 
 fn start_db_thread<S: BitswapStore>(
-  mut store: S,
+  store: S,
 ) -> (
   mpsc::UnboundedSender<DbRequest<S::Params>>,
   mpsc::UnboundedReceiver<DbResponse>,
@@ -877,15 +877,15 @@ mod tests {
   impl BitswapStore for Store {
     type Params = DefaultParams;
 
-    fn contains(&mut self, cid: &Cid) -> Result<bool> {
+    fn contains(&self, cid: &Cid) -> Result<bool> {
       Ok(self.0.lock().unwrap().contains_key(cid))
     }
 
-    fn get(&mut self, cid: &Cid) -> Result<Option<Vec<u8>>> {
+    fn get(&self, cid: &Cid) -> Result<Option<Vec<u8>>> {
       Ok(self.0.lock().unwrap().get(cid).cloned())
     }
 
-    fn insert(&mut self, block: &Block<Self::Params>) -> Result<()> {
+    fn insert(&self, block: &Block<Self::Params>) -> Result<()> {
       self
         .0
         .lock()
@@ -894,7 +894,7 @@ mod tests {
       Ok(())
     }
 
-    fn missing_blocks(&mut self, cid: &Cid) -> Result<Vec<Cid>> {
+    fn missing_blocks(&self, cid: &Cid) -> Result<Vec<Cid>> {
       let mut stack = vec![*cid];
       let mut missing = vec![];
       while let Some(cid) = stack.pop() {
